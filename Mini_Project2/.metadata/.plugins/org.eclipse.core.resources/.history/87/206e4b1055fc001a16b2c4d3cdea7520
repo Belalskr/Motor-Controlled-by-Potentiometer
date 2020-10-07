@@ -1,0 +1,73 @@
+/*
+ * main.c
+ *
+ *  Created on: Sep 21, 2020
+ *      Author: doaay
+ */
+#include"adc.h"
+uint8 duty_cycle=0;
+void PWM_Init(duty_cycle){
+	TCNT0=0;
+
+	TCCR0 |= (1<<WGM01) |(1<<WGM00) |(1<<CS01) |(1<<COM01);
+
+	OCR0=duty_cycle;
+
+	DDRB|=(1<<PB3);
+
+
+}
+void INT1_Init(void){
+	DDRD &=~(1<<PD3);
+	MCUCR|=(1<<ISC11)|(1<<ISC10); //Rising Edge
+	GICR|=(1<<INT1);//ENABLE MODULE FLAG
+	SREG|=(1<<7); //Global Flag
+
+
+}
+ISR(INT1_vect){
+	TOGGLE_BIT(PORTB,PB1);
+	TOGGLE_BIT(PORTB,PB0);
+}
+int main()
+{
+/*Initializing ADC AND LCD */
+	ADC_init();
+	LCD_init();
+	LCD_clearScreen();
+	LCD_displayString("ADC Value =");
+/* Initializing Motor */
+	DDRB|=(1<<PB0)|(1<<PB1);
+/*Clock Wise Direction*/
+	SET_BIT(PORTB,PB1);
+	CLEAR_BIT(PORTB,PB0);
+/* Initializing Timer0 PWD */
+	PWM_Init(duty_cycle);
+/*Initializing Switch*/
+	PORTD|=(1<<PD3);
+	INT1_Init();
+	while(1)
+	{
+		/*
+		 * Displaying ADC Value on The LCD SCREEN
+		 */
+
+
+		LCD_goToRowColumn(0,12);
+		uint16 result=ADC_readChannel(channel_0);
+		LCD_intgerToString(result);
+		if(result<1000){
+			LCD_displayStringRowColumn(0,15," ");
+		}
+		duty_cycle=result/4;
+		PWM_Init(duty_cycle);
+
+		/*Switch trigger*/
+		if(PIND&(1<<PD3)){
+			ISR(INT1_vect);
+		}
+
+
+	}
+}
+

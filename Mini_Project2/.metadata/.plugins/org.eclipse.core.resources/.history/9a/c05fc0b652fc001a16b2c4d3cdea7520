@@ -1,0 +1,30 @@
+/*
+ * main.c
+ *
+ *  Created on: Sep 21, 2020
+ *      Author: doaay
+ */
+#include"adc.h"
+
+int main()
+{
+//LCD_displayStringRowColumn(0,15," ");
+	ADC_init();
+	LCD_init();
+	LCD_clearScreen();
+	LCD_displayString("ADC Value =");
+
+
+	while(1)
+	{
+
+		LCD_goToRowColumn(0,12);
+		uint16 result=ADC_readChannel(channel_0);
+		LCD_intgerToString(result);
+		if(result<1000){
+			LCD_displayStringRowColumn(0,15," ");
+		}
+
+	}
+}
+
