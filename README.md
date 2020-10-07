@@ -4,4 +4,6 @@ This project has been implemented Using ATmega16 mircocontroller. It is written 
 
 When you change the potentiometer value , the DC-motor speed changes..
 
-when you push thebutton , external interrupt is activated and the DC MOTOR reverse its direction
+when you push thebutton , external interrupt is activated and the DC MOTOR reverse its direction.
+
+multiple AVR modules are used such as external interrupts and ADC 
